@@ -385,7 +385,7 @@ function playGame() {
 
             allDoors.forEach((door) => {
                 door.draw();
-                door.pressed = false;
+                door.pressed = CH.doors;
             });
 
             allBalls.forEach((ball) => {
@@ -445,7 +445,8 @@ function playGame() {
                 player.checkDoors();
 
                 if (player.died) {
-                    died = true;
+                    if (CH.god) player.died = false;
+                    else died = true;
                 }
             });
 
@@ -735,5 +736,23 @@ function playGame() {
         });
     });
 }
+
+/* Arcade Campus Hub: cheats for its Campus+ mod menu (window.ACH_MODS is
+   read by the hub's game-cheats.js). Nothing here runs unless someone uses it. */
+const CH = { god: false, doors: false };
+window.ACH_MODS = {
+    name: "Waterboy & Firegirl",
+    cheats: [
+        { id: "god", label: "Water, lava and goo can't hurt you", type: "toggle", set(on) { CH.god = on; } },
+        { id: "gems", label: "Collect every gem", type: "button", run() { allDiamonds.length = 0; } },
+        { id: "doors", label: "Doors open by themselves (skip levels)", type: "toggle", set(on) { CH.doors = on; } },
+        { id: "unlock", label: "Unlock every level", type: "button",
+          run() {
+              for (const k in menuLevels) menuLevels[k].unlocked = true;
+              for (const k in menuLevelsPath) menuLevelsPath[k].unlocked = true;
+              saveDataToLocalStorage();
+          } },
+    ],
+};
 
 export { playGame };
